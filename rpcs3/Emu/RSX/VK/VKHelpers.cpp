@@ -589,17 +589,44 @@ namespace vk
 		}
 	}
 
-	void wait_for_fence(VkFence fence)
+	void wait_for_fence(VkFence fence, u64 timeout_us)
 	{
-		while (auto status = vkGetFenceStatus(*g_current_renderer, fence))
+		u64 start_time;
+		if (timeout_us)
+		{
+			start_time = get_system_time();
+		}
+
+		while (const auto status = vkGetFenceStatus(*g_current_renderer, fence))
 		{
 			switch (status)
 			{
 			case VK_NOT_READY:
-				continue;
+				break;
 			default:
 				die_with_error(HERE, status);
 				return;
+			}
+
+			if (Emu.IsStopped())
+			{
+				// Abort
+				return;
+			}
+			else if (Emu.IsPaused())
+			{
+				// Idle, ideally should only touch this once
+				std::this_thread::sleep_for(1ms);
+				continue;
+			}
+			else if (timeout_us)
+			{
+				const auto current_time = get_system_time();
+				if ((current_time - start_time) > timeout_us)
+				{
+					LOG_ERROR(RSX, "vk::wait_for_fence() has timed out after %dus", timeout_us);
+					return;
+				}
 			}
 		}
 	}
