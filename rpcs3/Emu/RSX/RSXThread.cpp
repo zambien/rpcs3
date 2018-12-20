@@ -778,7 +778,7 @@ namespace rsx
 		const u32 first = draw_indexed_clause.min_index();
 		const u32 count = draw_indexed_clause.get_elements_count();
 
-		const gsl::byte* ptr = static_cast<const gsl::byte*>(vm::base(address));
+		const gsl::byte* ptr = reinterpret_cast<const gsl::byte*>(vm::get_super_ptr(address));
 		return{ ptr + first * type_size, count * type_size };
 	}
 
@@ -2164,7 +2164,7 @@ namespace rsx
 				}
 
 				const u32 data_size = block.attribute_stride * unique_verts;
-				memcpy(persistent, (char*)vm::base(block.real_offset_address) + vertex_base, data_size);
+				memcpy(persistent, (char*)vm::get_super_ptr(block.real_offset_address) + vertex_base, data_size);
 				persistent += data_size;
 			}
 		}
