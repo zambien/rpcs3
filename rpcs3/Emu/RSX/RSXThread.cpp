@@ -538,6 +538,8 @@ namespace rsx
 			// Idle if emulation paused
 			if (Emu.IsPaused())
 			{
+				// Execute backend task to keep the wm queue running and prevent deadlock in win32 thread
+				do_local_task(rsx::FIFO_state::paused);
 				std::this_thread::sleep_for(1ms);
 				continue;
 			}

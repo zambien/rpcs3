@@ -111,11 +111,12 @@ namespace rsx
 
 	enum FIFO_state : u8
 	{
-		running = 0,
-		empty = 1,    // PUT == GET
-		spinning = 2, // Puller continuously jumps to self addr (synchronization technique)
-		nop = 3,      // Puller is processing a NOP command
-		lock_wait = 4 // Puller is processing a lock acquire
+		running = 0,   // Normal
+		empty = 1,     // PUT == GET
+		spinning = 2,  // Puller continuously jumps to self addr (synchronization technique)
+		nop = 3,       // Puller is processing a NOP command
+		lock_wait = 4, // Puller is processing a lock acquire
+		paused = 5     // Puller is currently paused
 	};
 
 	enum FIFO_hint : u8
